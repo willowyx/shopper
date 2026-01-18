@@ -36,7 +36,7 @@ function addTodo() {
     text: newTodo.value,
     qty: newQty.value,
     done: false,
-    img: newImg.value,
+    img: sgImageShow.value ? newImg.value || 'noitem.png' : '',
   })
   newTodo.value = ''
   newQty.value = 1
