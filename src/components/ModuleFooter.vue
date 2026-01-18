@@ -14,7 +14,7 @@ const showAttributions = ref(false)
     <span class="right-wrap">
       <a class="link-btn" target="_blank" href="https://willowyx.dev/projects/shopper">website</a>
       <a class="link-btn" target="_blank" href="https://github.com/willowyx/shopper">github</a>
-      <a class="link-btn" target="_blank" href="https://github.com/willowyx/clicks/commits/main/"
+      <a class="link-btn" target="_blank" href="https://github.com/willowyx/shopper/commits/main/"
         >update history</a
       >
       <a class="link-btn" href="#" @click.prevent="showAttributions = true">attributions</a>
