@@ -1,0 +1,92 @@
+@import './base.css';
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}
+
+.footer-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-wrap {
+  display: inline-flex;
+  justify-content: flex-start;
+}
+
+.right-wrap {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.formitem > input {
+  padding: 3px;
+  transition: 0.4s;
+  border-radius: 5px;
+  margin: 10px 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  width: 100%;
+}
+
+.shbtn {
+  text-decoration: none;
+  padding: 7px;
+  transition: 0.2s;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.reg-btn {
+  color: #fff;
+  background: rgb(28, 189, 0);
+}
+
+.reg-btn:active {
+  background: rgb(21, 143, 0);
+}
+
+.warn-btn {
+  border: 1px solid rgb(189, 28, 0);
+}
+
+.link-btn {
+  cursor: pointer;
+  color: rgb(0, 104, 104);
+}
+
+.bw-filter {
+  filter: grayscale(100%);
+}
+
+.formgroup {
+  flex: 0 0 300px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  padding: 15px;
+  border-radius: 15px;
+  border: 2px solid rgb(28, 189, 0);
+  justify-content: center;
+}
+
+.fg-subgroup {
+  border-radius: 15px;
+  border: 2px solid #000;
+  margin: 5px 0 5px 0;
+}
+
+.fg-subgroup > * {
+  margin: 5px;
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+}
