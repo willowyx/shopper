@@ -3,7 +3,7 @@ import { BTable } from 'bootstrap-vue-next'
 
 const attributionsItems = [
   {
-    img: 'noimg.jpg',
+    img: 'noimg.png',
     caption: '[sample attribution]',
     url: '[sample link]',
   },

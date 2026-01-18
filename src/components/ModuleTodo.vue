@@ -182,4 +182,19 @@ const fields = [
 .formitem {
   display: block;
 }
+
+@media (max-width: 768px) {
+  .todo-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 3%;
+  }
+  .formgroup {
+    flex: auto;
+    margin: 7%;
+  }
+  .todo-table {
+    overflow-x: auto;
+  }
+}
 </style>
