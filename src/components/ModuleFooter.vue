@@ -1,10 +1,13 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { version } from '../../package.json'
 import ModuleAttributions from './ModuleAttributions.vue'
 import { BModal } from 'bootstrap-vue-next'
 
 const showAttributions = ref(false)
+
+const isDark = inject('isDark')
+const toggleDark = inject('toggleDark')
 </script>
 
 <template>
@@ -18,6 +21,9 @@ const showAttributions = ref(false)
         >update history</a
       >
       <a class="link-btn" href="#" @click.prevent="showAttributions = true">attributions</a>
+      <a class="link-btn" href="#" @click.prevent="toggleDark"
+        >{{ isDark ? 'light' : 'dark' }} mode</a
+      >
       <BModal v-model="showAttributions" title="Attributions" size="lg" hide-footer ok-only>
         <ModuleAttributions />
       </BModal>

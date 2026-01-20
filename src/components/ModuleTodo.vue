@@ -1,6 +1,6 @@
 <script setup lang="js">
 import { ref, watch } from 'vue'
-import { BTable, BFormCheckbox } from 'bootstrap-vue-next'
+import { BTable, BFormCheckbox, BCard } from 'bootstrap-vue-next'
 
 let dfid = 0
 
@@ -17,11 +17,50 @@ const newQty = ref(1)
 const newImg = ref('')
 const imageLockState = ref(false)
 const fileInput = ref(null)
+const nameInput = ref('')
 const todos = ref([
-  { id: dfid++, text: 'Bread', qty: 1, done: false },
-  { id: dfid++, text: 'Eggs', qty: 12, done: false },
-  { id: dfid++, text: 'Cheese', qty: 1, done: false },
+  { id: dfid++, text: 'Paper plates', qty: 1, img: 'noitem.png', done: true },
+  { id: dfid++, text: 'Eggs', qty: 12, img: 'noitem.png', done: false },
 ])
+const csname = ref('Alyssa')
+const isInit = ref(false)
+
+watch(isInit, (newValue) => {
+  if (newValue) {
+    for (let i = 0; i < document.getElementsByClassName('todo-bc-wrapper').length; i++) {
+      document.getElementsByClassName('todo-bc-wrapper')[i].classList.remove('novis')
+    }
+    for (let i = 0; i < document.getElementsByClassName('fc-home').length; i++) {
+      document.getElementsByClassName('fc-home')[i].classList.add('novis')
+    }
+  }
+})
+
+function startNew(list, name, isImport) {
+  if (list) {
+    todos.value = list
+  }
+  if (name) {
+    csname.value = name
+  } else if (isImport) {
+    csname.value = '' // fill name from import
+  }
+  isInit.value = true
+}
+
+function startExport() {
+  // todo:
+  // sforName: name
+  // dataName: constant e.g. shopper-save
+  // saveVer: version
+  const blob = new Blob([JSON.stringify(todos.value)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${csname.value}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 function addTodo() {
   if (newImg.value) {
@@ -80,16 +119,16 @@ const fields = [
   {
     key: 'done',
     label: 'Complete',
+    sortable: false, // todo: fix this
+  },
+  {
+    key: 'text',
+    label: 'Item',
     sortable: true,
   },
   {
     key: 'qty',
     label: 'Qty',
-    sortable: true,
-  },
-  {
-    key: 'text',
-    label: 'Item',
     sortable: true,
   },
   {
@@ -106,73 +145,121 @@ const fields = [
 </script>
 
 <template>
-  <div class="todo-wrapper">
-    <form class="formgroup" v-on:submit.prevent="addTodo">
-      <label class="formitem"
-        >Item
-        <input v-model="newTodo" required placeholder="e.g. Whole wheat bread" />
-      </label>
-      <label class="formitem"
-        >Qty
-        <input v-model="newQty" required value="1" />
-      </label>
-      <label>Image <BFormCheckbox switch v-model="sgImageShow" /></label>
-      <div class="fg-subgroup" v-show="sgImageShow">
-        <label class="formitem"
-          >Link
-          <input
-            v-model="newImg"
-            placeholder="begins with https:// or data:"
-            :disabled="imageLockState"
-          />
+  <div class="fc-home">
+    <BCard>
+      Start a new shopping list
+      <div class="formgroup fg-styled">
+        <label class="formitem">
+          Shopping for:
+          <input type="text" required placeholder="e.g. Alyssa" v-model="nameInput" />
         </label>
+        <button class="shbtn reg-btn" @click="startNew(null, nameInput, false)">Start new</button>
+      </div>
+    </BCard>
+    <BCard class="novis">
+      Or, import an existing one
+      <div class="formgroup fg-styled">
         <label class="formitem"
           >Upload
-          <input type="file" accept="image/*" @change="onFileChange" ref="fileInput" />
+          <input type="file" accept="application/json" ref="importInput" />
         </label>
-        <button type="button" v-if="imageLockState" @click="clearImage" class="shbtn warn-btn">
-          Clear Image
+        <button
+          class="shbtn"
+          @click="
+            startNew(
+              (list = importInput),
+              (name = JSON.parse(importInput.value.files[0].text(csname))),
+              (isImport = true),
+            )
+          "
+        >
+          Import
         </button>
       </div>
-      <button class="shbtn reg-btn w-100">Add</button>
-    </form>
+    </BCard>
+  </div>
+  <div class="todo-bc-wrapper novis">
+    <BCard>
+      <form class="formgroup fg-styled" v-on:submit.prevent="addTodo">
+        <label class="formitem"
+          >Item
+          <input v-model="newTodo" required placeholder="e.g. Whole wheat bread" />
+        </label>
+        <label class="formitem"
+          >Qty
+          <input v-model="newQty" required value="1" />
+        </label>
+        <label>Image <BFormCheckbox switch v-model="sgImageShow" /></label>
+        <div class="fg-subgroup" v-show="sgImageShow">
+          <label class="formitem"
+            >Link
+            <input
+              v-model="newImg"
+              placeholder="begins with https:// or data:"
+              :disabled="imageLockState"
+            />
+          </label>
+          <label class="formitem"
+            >Upload
+            <input type="file" accept="image/*" @change="onFileChange" ref="fileInput" />
+          </label>
+          <button type="button" v-if="imageLockState" @click="clearImage" class="shbtn warn-btn">
+            Clear Image
+          </button>
+        </div>
+        <button class="shbtn reg-btn w-100">Add</button>
+      </form>
 
-    <div class="todo-table">
-      <BTable striped bordered hover :items="todos" :fields="fields">
-        <template #cell(done)="{ item }">
-          <BFormCheckbox v-model="item.done" size="lg" />
-        </template>
-        <template #cell(qty)="{ item }">
-          <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
-            item.qty
-          }}</span>
-        </template>
-        <template #cell(text)="{ item }">
-          <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
-            item.text
-          }}</span>
-        </template>
-        <template #cell(img)="{ item }">
-          <img
-            v-if="item.img"
-            :class="{ 'bw-filter': item.done }"
-            :src="item.img"
-            style="max-width: 100px; max-height: 100px"
-          />
-        </template>
-        <template #cell(delete)="{ item }">
-          <button v-on:click="removeTodo(item)" class="shbtn warn-btn">Delete</button>
-        </template>
-      </BTable>
-    </div>
+      <div class="centered">
+        <h5>Shopping for</h5>
+        <h4>
+          {{ csname }}
+        </h4>
+      </div>
+      <div class="todo-table">
+        <BTable striped bordered hover :items="todos" :fields="fields">
+          <template #cell(done)="{ item }">
+            <BFormCheckbox v-model="item.done" size="lg" />
+          </template>
+          <template #cell(text)="{ item }">
+            <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
+              item.text
+            }}</span>
+          </template>
+          <template #cell(qty)="{ item }">
+            <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
+              item.qty
+            }}</span>
+          </template>
+          <template #cell(img)="{ item }">
+            <img
+              v-if="item.img"
+              :class="{ 'bw-filter': item.done }"
+              :src="item.img"
+              style="max-width: 100px; max-height: 100px"
+            />
+          </template>
+          <template #cell(delete)="{ item }">
+            <button v-on:click="removeTodo(item)" class="shbtn warn-btn">Delete</button>
+          </template>
+        </BTable>
+      </div>
+    </BCard>
+    <button class="shbtn" @click="startExport()" :disabled="!todos.length">Export</button>
   </div>
 </template>
 
 <style scoped>
+.fc-home {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
 .todo-wrapper {
   display: flex;
-  gap: 20px;
   align-items: flex-start;
+  gap: 1rem;
 }
 
 .todo-table {
@@ -187,11 +274,9 @@ const fields = [
   .todo-wrapper {
     flex-direction: column;
     align-items: stretch;
-    margin: 3%;
   }
   .formgroup {
     flex: auto;
-    margin: 7%;
   }
   .todo-table {
     overflow-x: auto;
