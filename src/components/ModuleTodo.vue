@@ -210,12 +210,13 @@ const fields = [
         <button class="shbtn reg-btn w-100">Add</button>
       </form>
 
-      <div class="centered">
-        <h5>Shopping for</h5>
-        <h4>
+      <div class="centered header-fixed">
+        <h6>Shopping for</h6>
+        <h5>
           {{ csname }}
-        </h4>
+        </h5>
       </div>
+      <br /><br />
       <div class="todo-table">
         <BTable striped bordered hover :items="todos" :fields="fields">
           <template #cell(done)="{ item }">
@@ -245,7 +246,10 @@ const fields = [
         </BTable>
       </div>
     </BCard>
-    <button class="shbtn" @click="startExport()" :disabled="!todos.length">Export</button>
+    <BCard>
+      Export list:
+      <button class="shbtn" @click="startExport()" :disabled="!todos.length">Export</button>
+    </BCard>
   </div>
 </template>
 

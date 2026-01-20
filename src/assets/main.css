@@ -2,7 +2,7 @@
 
 #app {
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 10% auto;
   padding: 2rem;
   font-weight: normal;
 }
@@ -94,6 +94,19 @@
   margin: 5px;
 }
 
+.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 10%;
+  overflow: hidden;
+  background-color: #cfcfcf;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
 [data-bs-theme='dark'] body {
   background-color: #212529;
   color: #f8f9fa;
@@ -111,6 +124,10 @@
 
 [data-bs-theme='dark'] .link-btn {
   color: #6ea8fe;
+}
+
+[data-bs-theme='dark'] .header-fixed {
+  background-color: #101113;
 }
 
 @media (min-width: 1024px) {
