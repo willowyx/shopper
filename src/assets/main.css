@@ -27,7 +27,12 @@
 .right-wrap {
   display: inline-flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 10px;
+}
+
+.footer-btn {
+  min-width: 30%;
 }
 
 .formitem > input {
@@ -63,6 +68,13 @@
 .link-btn {
   cursor: pointer;
   color: rgb(0, 104, 104);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.link-btn:hover {
+  color: #fff;
+  background: rgb(0, 61, 61);
 }
 
 .bw-filter {
@@ -142,6 +154,9 @@
     flex-direction: column;
     justify-content: center;
     text-align: center;
+  }
+  .right-wrap {
+    justify-content: center;
   }
 }
 

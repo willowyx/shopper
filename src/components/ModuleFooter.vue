@@ -15,13 +15,22 @@ const toggleDark = inject('toggleDark')
   <div class="footer-wrap">
     <span class="left-wrap"> willowyx/shopper:v{{ version }} (pre) </span>
     <span class="right-wrap">
-      <a class="link-btn" target="_blank" href="https://willowyx.dev/projects/shopper">website</a>
-      <a class="link-btn" target="_blank" href="https://github.com/willowyx/shopper">github</a>
-      <a class="link-btn" target="_blank" href="https://github.com/willowyx/shopper/commits/main/"
+      <a class="link-btn footer-btn" target="_blank" href="https://willowyx.dev/projects/shopper"
+        >website</a
+      >
+      <a class="link-btn footer-btn" target="_blank" href="https://github.com/willowyx/shopper"
+        >github</a
+      >
+      <a
+        class="link-btn footer-btn"
+        target="_blank"
+        href="https://github.com/willowyx/shopper/commits/main/"
         >update history</a
       >
-      <a class="link-btn" href="#" @click.prevent="showAttributions = true">attributions</a>
-      <a class="link-btn" href="#" @click.prevent="toggleDark"
+      <a class="link-btn footer-btn" href="#" @click.prevent="showAttributions = true"
+        >attributions</a
+      >
+      <a class="link-btn footer-btn" href="#" @click.prevent="toggleDark"
         >{{ isDark ? 'light' : 'dark' }} mode</a
       >
       <BModal v-model="showAttributions" title="Attributions" size="lg" hide-footer ok-only>
