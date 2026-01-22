@@ -13,8 +13,7 @@ const toggleDark = inject('toggleDark')
 <template>
   <hr />
   <div class="footer-wrap">
-    <span class="left-wrap"> willowyx/shopper:v{{ version }} (pre) </span>
-    <span class="right-wrap">
+    <span class="left-wrap">
       <a class="link-btn footer-btn" target="_blank" href="https://willowyx.dev/projects/shopper"
         >website</a
       >
@@ -36,6 +35,10 @@ const toggleDark = inject('toggleDark')
       <BModal v-model="showAttributions" title="Attributions" size="lg" hide-footer ok-only>
         <ModuleAttributions />
       </BModal>
+    </span>
+    <span class="right-wrap">
+      <img class="favicon" alt="shopper" src="../../favicon.ico">
+      willowyx/shopper:v{{ version }} (pre)
     </span>
   </div>
 </template>

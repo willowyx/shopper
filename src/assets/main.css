@@ -22,13 +22,13 @@
 .left-wrap {
   display: inline-flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .right-wrap {
   display: inline-flex;
   justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 .footer-btn {
@@ -149,17 +149,22 @@
   }
 }
 
+.favicon {
+  height: 32px;
+  width: 32px;
+}
+
+.novis {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
   .footer-wrap {
     flex-direction: column;
     justify-content: center;
     text-align: center;
   }
-  .right-wrap {
+  .left-wrap {
     justify-content: center;
   }
-}
-
-.novis {
-  display: none !important;
 }
