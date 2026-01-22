@@ -1,6 +1,7 @@
 <script setup lang="js">
 import { ref, watch } from 'vue'
 import { BTable, BFormCheckbox, BCard } from 'bootstrap-vue-next'
+import { version } from '../../package.json'
 
 let dfid = 0
 
@@ -49,11 +50,12 @@ function startNew(list, name, isImport) {
 }
 
 function startExport() {
-  // todo:
-  // sforName: name
-  // dataName: constant e.g. shopper-save
-  // saveVer: version
-  const blob = new Blob([JSON.stringify(todos.value)], { type: 'application/json' })
+  const exportData = {
+    dataName: 'shopper-data',
+    gameVersion: version,
+    data: todos.value,
+  }
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -159,20 +161,16 @@ const fields = [
     <BCard class="novis">
       Or, import an existing one
       <div class="formgroup fg-styled">
-        <label class="formitem"
-          >Upload
+        <label class="formitem">Upload
           <input type="file" accept="application/json" ref="importInput" />
         </label>
-        <button
-          class="shbtn"
-          @click="
-            startNew(
-              (list = importInput),
-              (name = JSON.parse(importInput.value.files[0].text(csname))),
-              (isImport = true),
-            )
-          "
-        >
+        <button class="shbtn" @click="
+          startNew(
+            (list = importInput),
+            (name = JSON.parse(importInput.value.files[0].text(csname))),
+            (isImport = true),
+          )
+          ">
           Import
         </button>
       </div>
@@ -181,26 +179,20 @@ const fields = [
   <div class="todo-bc-wrapper novis">
     <BCard>
       <form class="formgroup fg-styled" v-on:submit.prevent="addTodo">
-        <label class="formitem"
-          >Item
+        <label class="formitem">Item
           <input v-model="newTodo" required placeholder="e.g. Whole wheat bread" />
         </label>
-        <label class="formitem"
-          >Qty
+        <label class="formitem">Qty
           <input v-model="newQty" required value="1" />
         </label>
-        <label>Image <BFormCheckbox switch v-model="sgImageShow" /></label>
+        <label>Image
+          <BFormCheckbox switch v-model="sgImageShow" />
+        </label>
         <div class="fg-subgroup" v-show="sgImageShow">
-          <label class="formitem"
-            >Link
-            <input
-              v-model="newImg"
-              placeholder="begins with https:// or data:"
-              :disabled="imageLockState"
-            />
+          <label class="formitem">Link
+            <input v-model="newImg" placeholder="begins with https:// or data:" :disabled="imageLockState" />
           </label>
-          <label class="formitem"
-            >Upload
+          <label class="formitem">Upload
             <input type="file" accept="image/*" @change="onFileChange" ref="fileInput" />
           </label>
           <button type="button" v-if="imageLockState" @click="clearImage" class="shbtn warn-btn">
@@ -210,7 +202,7 @@ const fields = [
         <button class="shbtn reg-btn w-100">Add</button>
       </form>
 
-      <div class="centered header-fixed">
+      <div class="centered header-fixed info-banner">
         <h6>Shopping for</h6>
         <h5>
           {{ csname }}
@@ -225,20 +217,16 @@ const fields = [
           <template #cell(text)="{ item }">
             <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
               item.text
-            }}</span>
+              }}</span>
           </template>
           <template #cell(qty)="{ item }">
             <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
               item.qty
-            }}</span>
+              }}</span>
           </template>
           <template #cell(img)="{ item }">
-            <img
-              v-if="item.img"
-              :class="{ 'bw-filter': item.done }"
-              :src="item.img"
-              style="max-width: 100px; max-height: 100px"
-            />
+            <img v-if="item.img" :class="{ 'bw-filter': item.done }" :src="item.img"
+              style="max-width: 100px; max-height: 100px" />
           </template>
           <template #cell(delete)="{ item }">
             <button v-on:click="removeTodo(item)" class="shbtn warn-btn">Delete</button>
@@ -254,15 +242,20 @@ const fields = [
 </template>
 
 <style scoped>
+.info-banner {
+  padding: 1%;
+  cursor: pointer;
+}
+
 .fc-home {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
 }
 
-.todo-wrapper {
+.todo-bc-wrapper {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 1rem;
 }
 
@@ -275,13 +268,15 @@ const fields = [
 }
 
 @media (max-width: 768px) {
-  .todo-wrapper {
+  .todo-bc-wrapper {
     flex-direction: column;
     align-items: stretch;
   }
+
   .formgroup {
     flex: auto;
   }
+
   .todo-table {
     overflow-x: auto;
   }
