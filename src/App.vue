@@ -31,8 +31,6 @@ onMounted(() => {
   <h1 class="header">shopper</h1>
   <BApp>
     <main>
-      <ModuleHome />
-
       <ModuleTodo />
       <ModuleFooter />
     </main>
