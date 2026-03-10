@@ -18,6 +18,7 @@ const newQty = ref(1)
 const newImg = ref('')
 const imageLockState = ref(false)
 const fileInput = ref(null)
+const importInput = ref(null)
 const nameInput = ref('')
 const todos = ref([
   { id: dfid++, text: 'Paper plates', qty: 1, img: 'noitem.png', done: true },
@@ -34,6 +35,13 @@ watch(isInit, (newValue) => {
     for (let i = 0; i < document.getElementsByClassName('fc-home').length; i++) {
       document.getElementsByClassName('fc-home')[i].classList.add('novis')
     }
+  } else {
+    for (let i = 0; i < document.getElementsByClassName('todo-bc-wrapper').length; i++) {
+      document.getElementsByClassName('todo-bc-wrapper')[i].classList.add('novis')
+    }
+    for (let i = 0; i < document.getElementsByClassName('fc-home').length; i++) {
+      document.getElementsByClassName('fc-home')[i].classList.remove('novis')
+    }
   }
 })
 
@@ -47,12 +55,14 @@ function startNew(list, name, isImport) {
     csname.value = '' // fill name from import
   }
   isInit.value = true
+  clearImportSelection()
 }
 
 function startExport() {
   const exportData = {
     dataName: 'shopper-data',
     gameVersion: version,
+    customerName: csname.value,
     data: todos.value,
   }
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
@@ -62,6 +72,80 @@ function startExport() {
   a.download = `${csname.value}.json`
   a.click()
   URL.revokeObjectURL(url)
+}
+
+function deleteList() {
+  if (!todos.value.length) {
+    return
+  }
+
+  if (!confirm("Delete all list data?")) {
+    return
+  }
+
+  todos.value = []
+  isInit.value = false
+}
+
+function clearImportSelection() {
+  if (importInput.value) {
+    importInput.value.value = ''
+  }
+}
+
+function getImportedName(parsedData, fileName) {
+  if (parsedData && typeof parsedData.customerName === 'string' && parsedData.customerName.trim()) {
+    return parsedData.customerName.trim()
+  }
+  if (fileName.endsWith('.json')) {
+    return fileName.slice(0, -5)
+  }
+  return ''
+}
+
+function normalizeImportedTodos(parsedData) {
+  const importedTodos = Array.isArray(parsedData) ? parsedData : parsedData?.data
+  if (!Array.isArray(importedTodos)) {
+    return null
+  }
+
+  const normalized = importedTodos
+    .filter((item) => item && typeof item === 'object')
+    .map((item, index) => ({
+      id: Number.isInteger(item.id) ? item.id : index,
+      text: typeof item.text === 'string' ? item.text : '',
+      qty: item.qty ?? 1,
+      img: typeof item.img === 'string' ? item.img : 'noitem.png',
+      done: Boolean(item.done),
+    }))
+    .filter((item) => item.text.trim().length > 0)
+
+  return normalized
+}
+
+async function startImport() {
+  const file = importInput.value?.files?.[0]
+  if (!file) {
+    alert('No file chosen')
+    return
+  }
+  clearImportSelection()
+
+  try {
+    const fileText = await file.text()
+    const parsedData = JSON.parse(fileText)
+    const importedTodos = normalizeImportedTodos(parsedData)
+
+    if (!importedTodos || importedTodos.length === 0) {
+      alert('Invalid file')
+      return
+    }
+
+    dfid = importedTodos.reduce((maxId, todo) => Math.max(maxId, todo.id), -1) + 1
+    startNew(importedTodos, getImportedName(parsedData, file.name), true)
+  } catch {
+    alert('Unable to import file')
+  }
 }
 
 function addTodo() {
@@ -158,19 +242,13 @@ const fields = [
         <button class="shbtn reg-btn" @click="startNew(null, nameInput, false)">Start new</button>
       </div>
     </BCard>
-    <BCard class="novis">
+    <BCard>
       Or, import an existing one
       <div class="formgroup fg-styled">
         <label class="formitem">Upload
           <input type="file" accept="application/json" ref="importInput" />
         </label>
-        <button class="shbtn" @click="
-          startNew(
-            (list = importInput),
-            (name = JSON.parse(importInput.value.files[0].text(csname))),
-            (isImport = true),
-          )
-          ">
+        <button class="shbtn" @click="startImport">
           Import
         </button>
       </div>
@@ -235,8 +313,10 @@ const fields = [
       </div>
     </BCard>
     <BCard>
-      Export list:
-      <button class="shbtn" @click="startExport()" :disabled="!todos.length">Export</button>
+      <div class="list-actions">
+        <button class="shbtn" @click="startExport()" :disabled="!todos.length">Export</button>
+        <button class="shbtn warn-btn" @click="deleteList" :disabled="!todos.length">Reset</button>
+      </div>
     </BCard>
   </div>
 </template>
@@ -261,6 +341,12 @@ const fields = [
 
 .todo-table {
   flex: 1;
+}
+
+.list-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .formitem {
