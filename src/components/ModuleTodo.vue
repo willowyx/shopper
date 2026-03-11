@@ -6,6 +6,13 @@ import { version } from '../../package.json'
 
 let dfid = 0
 
+function createDefaultTodos() {
+  return [
+    { id: dfid++, text: 'Paper plates', qty: 1, img: 'noitem.png', done: true },
+    { id: dfid++, text: 'Eggs', qty: 12, img: 'noitem.png', done: false },
+  ]
+}
+
 const sgImageShow = ref(true)
 
 watch(sgImageShow, (newValue) => {
@@ -21,10 +28,7 @@ const imageLockState = ref(false)
 const fileInput = ref(null)
 const importInput = ref(null)
 const nameInput = ref('')
-const todos = ref([
-  { id: dfid++, text: 'Paper plates', qty: 1, img: 'noitem.png', done: true },
-  { id: dfid++, text: 'Eggs', qty: 12, img: 'noitem.png', done: false },
-])
+const todos = ref(createDefaultTodos())
 const csname = ref('Alyssa')
 const isInit = ref(false)
 const showFinalGraph = ref(false)
@@ -53,8 +57,10 @@ watch(showFinalGraph, (isOpen) => {
 })
 
 function startNew(list, name, isImport) {
-  if (list) {
+  if (Array.isArray(list)) {
     todos.value = list
+  } else {
+    todos.value = createDefaultTodos()
   }
   if (name) {
     csname.value = name
@@ -83,10 +89,6 @@ function startExport() {
 }
 
 function deleteList() {
-  if (!todos.value.length) {
-    return
-  }
-
   if (!confirm("Clear all list data and return home?")) {
     return
   }
@@ -353,7 +355,7 @@ const fields = [
     </BCard>
     <BCard>
       <div class="list-actions">
-        <button class="shbtn" @click="startExport()" :disabled="!todos.length">Export</button>
+        <button class="shbtn" @click="startExport" :disabled="!todos.length">Export</button>
         <button class="shbtn warn-btn" @click="deleteList">Quit List</button>
       </div>
     </BCard>
