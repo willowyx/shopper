@@ -214,6 +214,13 @@ function toggleFinalGraph() {
   showFinalGraph.value = !showFinalGraph.value
 }
 
+function toggleTodoFromPresentation({ todoId, isDone }) {
+  const targetTodo = todos.value.find((todo) => todo.id === todoId)
+  if (targetTodo) {
+    targetTodo.done = Boolean(isDone)
+  }
+}
+
 function setBodyScrollLock(isLocked) {
   if (isLocked) {
     previousBodyOverflow = document.body.style.overflow
@@ -321,7 +328,7 @@ const fields = [
       <Transition name="sheet-up">
         <div v-if="showFinalGraph" class="presentation-sheet" aria-modal="true">
           <div class="presentation-sheet-inner">
-            <ModuleFinalGraph :todos="todos" :customer-name="csname" />
+            <ModuleFinalGraph :todos="todos" :customer-name="csname" @toggle-todo="toggleTodoFromPresentation" />
           </div>
         </div>
       </Transition>
@@ -384,7 +391,7 @@ const fields = [
   right: 0;
   bottom: 0;
   z-index: 110;
-  max-height: 85vh;
+  height: 90vh;
   overflow-y: auto;
   padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
 }
@@ -458,7 +465,7 @@ const fields = [
   }
 
   .presentation-sheet {
-    max-height: 90vh;
+    height: 90vh;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }

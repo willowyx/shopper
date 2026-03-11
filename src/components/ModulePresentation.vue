@@ -1,5 +1,6 @@
 <script setup lang="js">
 import { computed } from 'vue'
+import { BFormCheckbox } from 'bootstrap-vue-next'
 
 const props = defineProps({
   todos: {
@@ -11,6 +12,8 @@ const props = defineProps({
     default: '',
   },
 })
+
+const emit = defineEmits(['toggle-todo'])
 
 const totals = computed(() => {
   const totalItems = props.todos.length
@@ -35,6 +38,10 @@ const totals = computed(() => {
 })
 
 const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(0, 4))
+
+function onToggleItem(todoId, isDone) {
+  emit('toggle-todo', { todoId, isDone })
+}
 </script>
 
 <template>
@@ -75,6 +82,18 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
         <div class="bar-fill" :style="{ width: `${totals.itemProgress}%` }"></div>
       </div>
     </div>
+
+    <div class="checklist-card">
+      <h6>Shopping checklist</h6>
+      <ul v-if="todos.length" class="checklist">
+        <li v-for="todo in todos" :key="todo.id" :class="{ done: todo.done }">
+          <BFormCheckbox :model-value="todo.done" @update:model-value="(val) => onToggleItem(todo.id, val)" />
+          <span class="item-name">{{ todo.text }}</span>
+          <span class="item-meta">x{{ todo.qty }}</span>
+        </li>
+      </ul>
+      <p v-else class="all-done">No items yet</p>
+    </div>
   </section>
 </template>
 
@@ -87,6 +106,7 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
   border-radius: 18px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   background: linear-gradient(180deg, #f5fbf5 0%, #ffffff 42%);
+  min-height: 100%;
 }
 
 .screen-header {
@@ -130,7 +150,8 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
 }
 
 .progress-card,
-.list-card {
+.list-card,
+.checklist-card {
   border-radius: 12px;
   padding: 0.8rem;
   background: #fff;
@@ -138,7 +159,8 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
 }
 
 .progress-card h6,
-.list-card h6 {
+.list-card h6,
+.checklist-card h6 {
   margin: 0;
 }
 
@@ -147,10 +169,6 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.35rem;
-}
-
-.progress-head.second {
-  margin-top: 0.75rem;
 }
 
 .bar-bg {
@@ -165,10 +183,6 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
   height: 100%;
   background: linear-gradient(90deg, #1cbd00, #6ad65a);
   transition: width 0.3s ease;
-}
-
-.bar-fill.qty {
-  background: linear-gradient(90deg, #0d6efd, #5aa3ff);
 }
 
 .screen-list {
@@ -200,15 +214,37 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
   color: #5f6873;
 }
 
-.screen-list.muted .item-name,
-.screen-list.muted .item-meta {
-  color: #7a838e;
-  text-decoration: line-through;
-}
-
 .all-done {
   margin: 0.6rem 0 0;
   font-weight: 600;
+}
+
+.checklist {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 34vh;
+  overflow-y: auto;
+}
+
+.checklist li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.checklist li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.checklist li.done .item-name,
+.checklist li.done .item-meta {
+  text-decoration: line-through;
+  color: #7a838e;
 }
 
 [data-bs-theme='dark'] .screen-shell {
@@ -218,7 +254,8 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
 
 [data-bs-theme='dark'] .status-chip,
 [data-bs-theme='dark'] .progress-card,
-[data-bs-theme='dark'] .list-card {
+[data-bs-theme='dark'] .list-card,
+[data-bs-theme='dark'] .checklist-card {
   background: #20242a;
   border-color: rgba(248, 249, 250, 0.22);
 }
@@ -232,12 +269,13 @@ const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(
   background: #303846;
 }
 
-[data-bs-theme='dark'] .screen-list li {
+[data-bs-theme='dark'] .screen-list li,
+[data-bs-theme='dark'] .checklist li {
   border-color: rgba(248, 249, 250, 0.12);
 }
 
-[data-bs-theme='dark'] .screen-list.muted .item-name,
-[data-bs-theme='dark'] .screen-list.muted .item-meta {
+[data-bs-theme='dark'] .checklist li.done .item-name,
+[data-bs-theme='dark'] .checklist li.done .item-meta {
   color: #95a0ab;
 }
 </style>
