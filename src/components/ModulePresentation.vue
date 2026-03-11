@@ -37,7 +37,7 @@ const totals = computed(() => {
   }
 })
 
-const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(0, 4))
+const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(0, 2))
 
 function onToggleItem(todoId, isDone) {
   emit('toggle-todo', { todoId, isDone })
@@ -88,7 +88,9 @@ function onToggleItem(todoId, isDone) {
       <ul v-if="todos.length" class="checklist">
         <li v-for="todo in todos" :key="todo.id" :class="{ done: todo.done }">
           <BFormCheckbox :model-value="todo.done" @update:model-value="(val) => onToggleItem(todo.id, val)" />
-          <span class="item-name">{{ todo.text }}</span>
+          <button type="button" class="check-text-btn" @click="onToggleItem(todo.id, !todo.done)">
+            {{ todo.text }}
+          </button>
           <span class="item-meta">x{{ todo.qty }}</span>
         </li>
       </ul>
@@ -241,7 +243,22 @@ function onToggleItem(todoId, isDone) {
   padding-bottom: 0;
 }
 
-.checklist li.done .item-name,
+.check-text-btn {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+}
+
+.check-text-btn:hover {
+  text-decoration: underline;
+}
+
+.checklist li.done .check-text-btn,
 .checklist li.done .item-meta {
   text-decoration: line-through;
   color: #7a838e;
@@ -274,7 +291,7 @@ function onToggleItem(todoId, isDone) {
   border-color: rgba(248, 249, 250, 0.12);
 }
 
-[data-bs-theme='dark'] .checklist li.done .item-name,
+[data-bs-theme='dark'] .checklist li.done .check-text-btn,
 [data-bs-theme='dark'] .checklist li.done .item-meta {
   color: #95a0ab;
 }
