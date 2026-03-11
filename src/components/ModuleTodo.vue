@@ -1,5 +1,6 @@
 <script setup lang="js">
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
+import ModuleFinalGraph from './ModulePresentation.vue'
 import { BTable, BFormCheckbox, BCard } from 'bootstrap-vue-next'
 import { version } from '../../package.json'
 
@@ -26,6 +27,8 @@ const todos = ref([
 ])
 const csname = ref('Alyssa')
 const isInit = ref(false)
+const showFinalGraph = ref(false)
+let previousBodyOverflow = ''
 
 watch(isInit, (newValue) => {
   if (newValue) {
@@ -45,6 +48,10 @@ watch(isInit, (newValue) => {
   }
 })
 
+watch(showFinalGraph, (isOpen) => {
+  setBodyScrollLock(isOpen)
+})
+
 function startNew(list, name, isImport) {
   if (list) {
     todos.value = list
@@ -55,6 +62,7 @@ function startNew(list, name, isImport) {
     csname.value = '' // fill name from import
   }
   isInit.value = true
+  showFinalGraph.value = false
   clearImportSelection()
 }
 
@@ -79,12 +87,13 @@ function deleteList() {
     return
   }
 
-  if (!confirm("Delete all list data?")) {
+  if (!confirm("Clear all list data and return home?")) {
     return
   }
 
   todos.value = []
   isInit.value = false
+  showFinalGraph.value = false
 }
 
 function clearImportSelection() {
@@ -201,6 +210,25 @@ function removeTodo(todo) {
   todos.value = todos.value.filter((t) => t.id !== todo.id)
 }
 
+function toggleFinalGraph() {
+  showFinalGraph.value = !showFinalGraph.value
+}
+
+function setBodyScrollLock(isLocked) {
+  if (isLocked) {
+    previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return
+  }
+
+  document.body.style.overflow = previousBodyOverflow
+  previousBodyOverflow = ''
+}
+
+onBeforeUnmount(() => {
+  setBodyScrollLock(false)
+})
+
 const fields = [
   {
     key: 'done',
@@ -261,7 +289,7 @@ const fields = [
           <input v-model="newTodo" required placeholder="e.g. Whole wheat bread" />
         </label>
         <label class="formitem">Qty
-          <input v-model="newQty" required value="1" />
+          <input v-model="newQty" required type="number" min="0" value="1" />
         </label>
         <label>Image
           <BFormCheckbox switch v-model="sgImageShow" />
@@ -280,13 +308,24 @@ const fields = [
         <button class="shbtn reg-btn w-100">Add</button>
       </form>
 
-      <div class="centered header-fixed info-banner">
+      <div class="centered header-fixed info-banner" role="button" tabindex="0" :aria-expanded="showFinalGraph"
+        @click="toggleFinalGraph" @keydown.enter.prevent="toggleFinalGraph" @keydown.space.prevent="toggleFinalGraph">
         <h6>Shopping for</h6>
         <h5>
           {{ csname }}
         </h5>
       </div>
-      <br /><br />
+      <Transition name="sheet-fade">
+        <div v-if="showFinalGraph" class="presentation-backdrop" @click="toggleFinalGraph"></div>
+      </Transition>
+      <Transition name="sheet-up">
+        <div v-if="showFinalGraph" class="presentation-sheet" aria-modal="true">
+          <div class="presentation-sheet-inner">
+            <ModuleFinalGraph :todos="todos" :customer-name="csname" />
+          </div>
+        </div>
+      </Transition>
+      <div class="header-spacer"></div>
       <div class="todo-table">
         <BTable striped bordered hover :items="todos" :fields="fields">
           <template #cell(done)="{ item }">
@@ -315,7 +354,7 @@ const fields = [
     <BCard>
       <div class="list-actions">
         <button class="shbtn" @click="startExport()" :disabled="!todos.length">Export</button>
-        <button class="shbtn warn-btn" @click="deleteList" :disabled="!todos.length">Reset</button>
+        <button class="shbtn warn-btn" @click="deleteList">Quit List</button>
       </div>
     </BCard>
   </div>
@@ -325,6 +364,57 @@ const fields = [
 .info-banner {
   padding: 1%;
   cursor: pointer;
+}
+
+.header-spacer {
+  height: 5.5rem;
+}
+
+.presentation-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 105;
+}
+
+.presentation-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 110;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+.presentation-sheet-inner {
+  width: min(960px, calc(100% - 0.2rem));
+  margin: 0 auto;
+  box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.25);
+  border-radius: 20px 20px 0 0;
+}
+
+.sheet-fade-enter-active,
+.sheet-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.sheet-fade-enter-from,
+.sheet-fade-leave-to {
+  opacity: 0;
+}
+
+.sheet-up-enter-active,
+.sheet-up-leave-active {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.sheet-up-enter-from,
+.sheet-up-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
 }
 
 .fc-home {
@@ -354,6 +444,25 @@ const fields = [
 }
 
 @media (max-width: 768px) {
+  .fc-home {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fc-home :deep(.card) {
+    width: 100%;
+  }
+
+  .header-spacer {
+    height: 5rem;
+  }
+
+  .presentation-sheet {
+    max-height: 90vh;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
   .todo-bc-wrapper {
     flex-direction: column;
     align-items: stretch;
