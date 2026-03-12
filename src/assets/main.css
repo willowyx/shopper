@@ -115,8 +115,11 @@
   max-height: 10%;
   overflow: hidden;
   background-color: #cfcfcf;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
+  border: 1px solid #0000;
+}
+
+.header-fixed:hover {
+  border: 1px solid rgb(29, 173, 113);
 }
 
 [data-bs-theme='dark'] body {
@@ -140,6 +143,10 @@
 
 [data-bs-theme='dark'] .header-fixed {
   background-color: #101113;
+}
+
+[data-bs-theme='dark'] .presentation-sheet-base {
+  background: rgba(1, 36, 21, 0.95);
 }
 
 @media (min-width: 1024px) {

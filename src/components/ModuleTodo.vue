@@ -327,6 +327,9 @@ const fields = [
       <Transition name="sheet-fade">
         <div v-if="showFinalGraph" class="presentation-backdrop" @click="toggleFinalGraph"></div>
       </Transition>
+      <Transition name="sheet-fade">
+        <div v-if="showFinalGraph" class="presentation-sheet-base" aria-hidden="true"></div>
+      </Transition>
       <Transition name="sheet-up">
         <div v-if="showFinalGraph" class="presentation-sheet" aria-modal="true">
           <div class="presentation-sheet-inner">
@@ -343,12 +346,12 @@ const fields = [
           <template #cell(text)="{ item }">
             <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
               item.text
-              }}</span>
+            }}</span>
           </template>
           <template #cell(qty)="{ item }">
             <span :style="{ textDecoration: item.done ? 'line-through' : 'none' }">{{
               item.qty
-              }}</span>
+            }}</span>
           </template>
           <template #cell(img)="{ item }">
             <img v-if="item.img" :class="{ 'bw-filter': item.done }" :src="item.img"
@@ -379,12 +382,26 @@ const fields = [
   height: 5.5rem;
 }
 
-.presentation-backdrop {
+/* .presentation-backdrop {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 90vh;
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(2px);
   z-index: 105;
+} */
+
+.presentation-sheet-base {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 90vh;
+  background: rgba(29, 173, 113, 0.95);
+  z-index: 106;
+  pointer-events: none;
 }
 
 .presentation-sheet {
