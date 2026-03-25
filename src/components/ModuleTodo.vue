@@ -72,7 +72,11 @@ function startNew(list, name, isImport) {
   clearImportSelection()
 }
 
-function startExport() {
+async function startExport() {
+  if (!(await window.confirm('Any uploaded item images will be included and may result in a large file size. Continue?'))) {
+    return
+  }
+
   const exportData = {
     dataName: 'shopper-data',
     gameVersion: version,
@@ -88,8 +92,8 @@ function startExport() {
   URL.revokeObjectURL(url)
 }
 
-function deleteList() {
-  if (!confirm("Clear all list data and return home?")) {
+async function deleteList() {
+  if (!(await window.confirm('Clear all list data and return home?'))) {
     return
   }
 
@@ -137,7 +141,7 @@ function normalizeImportedTodos(parsedData) {
 async function startImport() {
   const file = importInput.value?.files?.[0]
   if (!file) {
-    alert('No file chosen')
+    await window.alert('No file chosen')
     return
   }
   clearImportSelection()
@@ -148,21 +152,21 @@ async function startImport() {
     const importedTodos = normalizeImportedTodos(parsedData)
 
     if (!importedTodos || importedTodos.length === 0) {
-      alert('Invalid file')
+      await window.alert('Invalid file')
       return
     }
 
     dfid = importedTodos.reduce((maxId, todo) => Math.max(maxId, todo.id), -1) + 1
     startNew(importedTodos, getImportedName(parsedData, file.name), true)
   } catch {
-    alert('Unable to import file')
+    await window.alert('Unable to import file')
   }
 }
 
-function addTodo() {
+async function addTodo() {
   if (newImg.value) {
     if (!newImg.value.startsWith('https://') && !newImg.value.startsWith('data:image/')) {
-      alert('Image URL must start with https:// or data:image/')
+      await window.alert('Image URL must start with https:// or data:image/')
       return
     }
   }
@@ -183,11 +187,11 @@ function addTodo() {
   }
 }
 
-function onFileChange(e) {
+async function onFileChange(e) {
   const file = e.target.files[0]
   if (file) {
     if (!file.type.startsWith('image/')) {
-      alert('File must be type: Image')
+      await window.alert('File must be type: Image')
       if (fileInput.value) fileInput.value.value = ''
       return
     }

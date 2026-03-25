@@ -75,7 +75,7 @@ function onToggleItem(todoId, isDone) {
           <div v-else class="next-image-empty">No image</div>
           <!-- <p class="next-image-label">Next item</p> -->
         </template>
-        <p v-else class="next-image-empty">Nothing queued</p>
+        <p v-else class="next-image-empty">No queued items</p>
       </article>
 
       <div class="list-card">
@@ -192,7 +192,6 @@ function onToggleItem(todoId, isDone) {
 }
 
 .next-image {
-  /* width: 100%; */
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 10px;
