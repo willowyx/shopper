@@ -38,6 +38,7 @@ const totals = computed(() => {
 })
 
 const nextItems = computed(() => props.todos.filter((todo) => !todo.done).slice(0, 2))
+const featuredNextItem = computed(() => nextItems.value[0] ?? null)
 
 function onToggleItem(todoId, isDone) {
   emit('toggle-todo', { todoId, isDone })
@@ -62,15 +63,31 @@ function onToggleItem(todoId, isDone) {
       </article>
     </div>
 
-    <div class="list-card">
-      <h6>Up next</h6>
-      <ul v-if="nextItems.length" class="screen-list">
-        <li v-for="todo in nextItems" :key="todo.id">
-          <span class="item-name">{{ todo.text }}</span>
-          <span class="item-meta">x{{ todo.qty }}</span>
-        </li>
-      </ul>
-      <p v-else class="all-done">All items checked</p>
+    <div class="next-row">
+      <article class="next-image-card">
+        <template v-if="featuredNextItem">
+          <img
+            v-if="featuredNextItem.img"
+            class="next-image"
+            :src="featuredNextItem.img"
+            :alt="featuredNextItem.text"
+          />
+          <div v-else class="next-image-empty">No image</div>
+          <!-- <p class="next-image-label">Next item</p> -->
+        </template>
+        <p v-else class="next-image-empty">Nothing queued</p>
+      </article>
+
+      <div class="list-card">
+        <h6>Up next</h6>
+        <ul v-if="nextItems.length" class="screen-list">
+          <li v-for="todo in nextItems" :key="todo.id">
+            <span class="item-name">{{ todo.text }}</span>
+            <span class="item-meta">x{{ todo.qty }}</span>
+          </li>
+        </ul>
+        <p v-else class="all-done">All items checked</p>
+      </div>
     </div>
 
     <div class="progress-card">
@@ -151,7 +168,14 @@ function onToggleItem(todoId, isDone) {
   font-size: 1rem;
 }
 
+.next-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 0.8rem;
+}
+
 .progress-card,
+.next-image-card,
 .list-card,
 .checklist-card {
   border-radius: 12px;
@@ -160,7 +184,43 @@ function onToggleItem(todoId, isDone) {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+.next-image-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.next-image {
+  /* width: 100%; */
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #eef3ee;
+}
+
+.next-image-label {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #5f6873;
+  font-weight: 600;
+}
+
+.next-image-empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin: 0;
+  border-radius: 10px;
+  background: #eef3ee;
+  color: #5f6873;
+  font-weight: 600;
+  text-align: center;
+}
+
 .progress-card h6,
+.next-image-card h6,
 .list-card h6,
 .checklist-card h6 {
   margin: 0;
@@ -270,6 +330,7 @@ function onToggleItem(todoId, isDone) {
 }
 
 [data-bs-theme='dark'] .status-chip,
+[data-bs-theme='dark'] .next-image-card,
 [data-bs-theme='dark'] .progress-card,
 [data-bs-theme='dark'] .list-card,
 [data-bs-theme='dark'] .checklist-card {
@@ -278,8 +339,14 @@ function onToggleItem(todoId, isDone) {
 }
 
 [data-bs-theme='dark'] .status-chip .label,
+[data-bs-theme='dark'] .next-image-label,
 [data-bs-theme='dark'] .item-meta {
   color: #b0b8c2;
+}
+
+[data-bs-theme='dark'] .next-image,
+[data-bs-theme='dark'] .next-image-empty {
+  background: #2a313b;
 }
 
 [data-bs-theme='dark'] .bar-bg {
@@ -294,5 +361,11 @@ function onToggleItem(todoId, isDone) {
 [data-bs-theme='dark'] .checklist li.done .check-text-btn,
 [data-bs-theme='dark'] .checklist li.done .item-meta {
   color: #95a0ab;
+}
+
+@media (max-width: 640px) {
+  .next-row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
